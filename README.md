@@ -128,6 +128,6 @@ Expected response:
 ### Alternative: test with curl
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/predict" -H "Content-Type: application/json" -d '{"food_type": "Mango", "temperature_c": 28, "humidity_pct": 70}'
+curl.exe -X POST "http://127.0.0.1:8000/predict" -H "Content-Type: application/json" -d '{\"food_type\": \"Mango\", \"temperature_c\": 28, \"humidity_pct\": 70}'
 ```
 
