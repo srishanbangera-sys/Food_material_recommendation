@@ -28,7 +28,7 @@ backend/
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/srishanbangera-sys/Waste_material_recommendation.git
 cd backend
 ```
 
