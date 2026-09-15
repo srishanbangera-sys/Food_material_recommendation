@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,500;1,600&family=Rubik:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,400;1,500;1,600&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap');
 
 html {
     scroll-behavior: smooth;
 }
 
 * {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Manrope', sans-serif;
 }
 
 .font-playfair {
@@ -360,4 +360,202 @@ select option {
 
 .snap-x > * {
     scroll-snap-align: start;
+}
+
+/* ── Refined product UI ── */
+body {
+    background: #07090d;
+    color: #f4f6f5;
+    text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+/* Replace the decorative demo treatment with a restrained product action. */
+.try-demo-btn {
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #07110e;
+    background: #62d9ae;
+    border: 1px solid #8de8c8;
+    border-radius: 999px;
+    padding: 0.7rem 1.1rem;
+    box-shadow: 0 8px 24px rgba(38, 180, 135, 0.16);
+    transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.try-demo-btn > div,
+.try-demo-btn > div > div,
+.try-demo-btn > div > div > div {
+    all: unset;
+}
+
+.try-demo-btn > div > div > div {
+    display: block;
+}
+
+.try-demo-btn:hover {
+    background: #8de8c8;
+    border-color: #b9f3df;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px rgba(38, 180, 135, 0.24);
+}
+
+.try-demo-btn:active {
+    transform: translateY(0);
+}
+
+.try-demo-btn:focus-visible {
+    outline: 2px solid #f1b56b;
+    outline-offset: 3px;
+}
+
+.recommend-step-next,
+.recommend-step-back,
+.result-card-anim,
+.step-anim-in {
+    animation-duration: 0.5s;
+}
+
+/* ── Pixel result display ── */
+@keyframes pixelBoot {
+    from { opacity: 0; transform: translateY(8px); clip-path: inset(50% 0 50% 0); }
+    to { opacity: 1; transform: translateY(0); clip-path: inset(0); }
+}
+
+@keyframes pixelBlink {
+    0%, 45% { opacity: 1; }
+    46%, 100% { opacity: 0.35; }
+}
+
+.pixel-results {
+    background-color: #080b12;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+.pixel-results .result-card-anim {
+    animation-name: pixelBoot;
+    animation-duration: 0.65s;
+    animation-timing-function: steps(8, end);
+}
+
+.pixel-heading,
+.pixel-value,
+.pixel-number {
+    font-family: 'Silkscreen', monospace;
+    letter-spacing: 0.02em;
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.pixel-kicker,
+.pixel-meta,
+.pixel-chip,
+.pixel-button {
+    font-family: 'Press Start 2P', monospace;
+    letter-spacing: 0.03em;
+}
+
+.pixel-kicker {
+    line-height: 1.8;
+}
+
+.pixel-meta {
+    line-height: 1.8;
+}
+
+.pixel-led {
+    display: block;
+    animation: pixelBlink 1.2s steps(2, end) infinite;
+    box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.12), 0 0 12px rgba(52, 211, 153, 0.75);
+}
+
+.pixel-panel {
+    position: relative;
+    clip-path: polygon(0 10px, 10px 10px, 10px 0, calc(100% - 10px) 0, calc(100% - 10px) 10px, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 10px calc(100% - 10px), 0 calc(100% - 10px));
+}
+
+.pixel-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(255, 255, 255, 0.025) 4px);
+    mix-blend-mode: screen;
+}
+
+.pixel-panel-primary {
+    background: #0a211f;
+    border: 1px solid #2dd4bf;
+    box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.15), 6px 6px 0 rgba(11, 58, 53, 0.65);
+}
+
+.pixel-panel-secondary {
+    background: #151820;
+    border: 1px solid #3a414e;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 6px 6px 0 rgba(4, 6, 10, 0.7);
+}
+
+.pixel-corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: #5eead4;
+    border-style: solid;
+    z-index: 1;
+}
+
+.pixel-corner-one {
+    top: 18px;
+    right: 18px;
+    border-width: 1px 1px 0 0;
+}
+
+.pixel-corner-two {
+    bottom: 18px;
+    left: 18px;
+    border-width: 0 0 1px 1px;
+}
+
+.pixel-chip {
+    background: #071514;
+    border: 1px solid rgba(94, 234, 212, 0.35);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.25);
+    font-size: 0.55rem;
+    line-height: 1.6;
+}
+
+.pixel-number {
+    color: #f5f7f4;
+    text-shadow: 4px 4px 0 #0a0d12;
+}
+
+.pixel-unit {
+    font-family: 'Silkscreen', monospace;
+}
+
+.pixel-rule {
+    background: #39404d;
+    box-shadow: 0 1px 0 #080b12;
+}
+
+.pixel-button {
+    background: #111720;
+    border: 1px solid #536172;
+    box-shadow: 4px 4px 0 #05070a;
+    line-height: 1.8;
+}
+
+.pixel-button:hover {
+    background: #18332f;
+    border-color: #5eead4;
+    color: #d7fff4;
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0 #05070a;
 }

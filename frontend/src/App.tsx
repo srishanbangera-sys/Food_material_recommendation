@@ -659,57 +659,57 @@ function AltCard({ rec, delay }: { rec: Recommendation; delay: number }) {
 
 function ResultsSection({ form, response, onReset }: { form: FormData; response: PredictionResponse; onReset: () => void }) {
   return (
-    <section id="results" className="relative w-full overflow-hidden bg-[#080b12] text-white">
-      <div className="absolute inset-0 opacity-20 bg-center bg-cover" style={{ backgroundImage: 'url(/bg3.png)' }} />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#080b12]/70 via-[#080b12]/95 to-[#080b12]" />
+    <section id="results" className="pixel-results relative w-full overflow-hidden bg-[#080b12] text-white">
+      <div className="absolute inset-0 opacity-10 bg-center bg-cover" style={{ backgroundImage: 'url(/bg3.png)' }} />
+      <div className="absolute inset-0 bg-[#080b12]/90" />
       <div className="relative z-10 max-w-5xl mx-auto px-5 sm:px-8 py-24 sm:py-32">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-10 result-card-anim">
           <div>
-            <div className="flex items-center gap-2 text-emerald-300 text-xs font-semibold uppercase tracking-[0.18em]">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
+            <div className="pixel-kicker flex items-center gap-2 text-emerald-300 text-xs font-semibold uppercase tracking-[0.18em]">
+              <span className="pixel-led w-2 h-2 bg-emerald-400" />
               Prediction Ready
             </div>
-            <h2 className="text-3xl sm:text-5xl font-bold text-white mt-3">Your packaging match</h2>
+            <h2 className="pixel-heading text-2xl sm:text-4xl font-bold text-white mt-4">Your packaging match</h2>
           </div>
-          <div className="text-sm text-white/40 sm:text-right">Analysis for<br /><span className="text-white/80">{response.food_type}</span></div>
+          <div className="pixel-meta text-xs text-white/40 sm:text-right">Analysis for<br /><span className="text-white/80">{response.food_type}</span></div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_0.65fr] gap-4">
-          <div className="relative overflow-hidden rounded-2xl border border-emerald-400/25 bg-emerald-400/[0.08] p-7 sm:p-10 result-card-anim" style={{ animationDelay: '0.12s' }}>
-            <div className="absolute -right-12 -top-12 w-44 h-44 rounded-full border border-emerald-300/15" />
-            <div className="absolute -right-5 -top-5 w-28 h-28 rounded-full border border-emerald-300/10" />
+          <div className="pixel-panel pixel-panel-primary relative overflow-hidden p-7 sm:p-10 result-card-anim" style={{ animationDelay: '0.12s' }}>
+            <div className="pixel-corner pixel-corner-one" />
+            <div className="pixel-corner pixel-corner-two" />
             <div className="relative">
-              <div className="flex items-center gap-3 text-emerald-200/70 text-xs uppercase tracking-[0.16em] font-semibold">
+              <div className="pixel-kicker flex items-center gap-3 text-emerald-200/70 text-xs uppercase tracking-[0.16em] font-semibold">
                 <PackageOpen size={18} strokeWidth={1.6} /> Recommended packaging
               </div>
-              <h3 className="max-w-xl text-3xl sm:text-5xl font-semibold leading-tight text-white mt-8">{response.packaging_type}</h3>
+              <h3 className="pixel-value max-w-xl text-3xl sm:text-5xl font-semibold leading-tight text-white mt-8">{response.packaging_type}</h3>
               <div className="flex flex-wrap gap-2 mt-8">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/15 px-3 py-2 text-xs text-white/70">
+                <span className="pixel-chip inline-flex items-center gap-2 px-3 py-2 text-xs text-white/70">
                   <Thermometer size={14} className="text-orange-300" /> {form.storageTemp}°C storage
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/15 px-3 py-2 text-xs text-white/70">
+                <span className="pixel-chip inline-flex items-center gap-2 px-3 py-2 text-xs text-white/70">
                   <span className="text-sky-300">RH</span> {form.humidity}% humidity
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-7 sm:p-8 flex flex-col justify-between result-card-anim" style={{ animationDelay: '0.22s' }}>
-            <div className="flex items-center gap-3 text-white/50 text-xs uppercase tracking-[0.16em] font-semibold">
+          <div className="pixel-panel pixel-panel-secondary p-7 sm:p-8 flex flex-col justify-between result-card-anim" style={{ animationDelay: '0.22s' }}>
+            <div className="pixel-kicker flex items-center gap-3 text-white/50 text-xs uppercase tracking-[0.16em] font-semibold">
               <Clock3 size={18} strokeWidth={1.6} className="text-amber-300" /> Predicted shelf life
             </div>
             <div className="mt-10">
-              <span className="text-6xl sm:text-7xl font-semibold tracking-tight text-white">{response.predicted_shelf_life_days}</span>
-              <span className="text-lg text-white/50 ml-2">days</span>
+              <span className="pixel-number text-5xl sm:text-6xl font-semibold text-white">{response.predicted_shelf_life_days}</span>
+              <span className="pixel-unit text-lg text-white/50 ml-2">days</span>
             </div>
-            <div className="h-px bg-white/10 mt-8 mb-4" />
-            <p className="text-xs text-white/40 leading-relaxed">Model estimate based on the submitted food type, temperature, and humidity.</p>
+            <div className="pixel-rule h-px mt-8 mb-4" />
+            <p className="pixel-meta text-xs text-white/40 leading-relaxed">Model estimate based on the submitted food type, temperature, and humidity.</p>
           </div>
         </div>
 
         <div className="flex justify-end mt-8 result-card-anim" style={{ animationDelay: '0.32s' }}>
           <button onClick={onReset}
-            className="text-sm font-medium text-white/60 hover:text-white border border-white/15 hover:border-emerald-300/40 px-6 py-3 rounded-full transition-all duration-200 hover:bg-white/5">
+            className="pixel-button text-xs font-medium text-white/60 hover:text-white px-6 py-3 transition-all duration-200">
             Try Another Product →
           </button>
         </div>
@@ -971,12 +971,7 @@ function Footer() {
             <p className="text-xs text-white/50 leading-relaxed max-w-xs">
               Questions or feedback regarding the recommendation engine?
             </p>
-            <a
-              href="mailto:contact@pakgenie.dev"
-              className="text-xs text-white/80 hover:text-teal-400 transition-colors underline underline-offset-4"
-            >
-              contact@pakgenie.dev
-            </a>
+            
             <span className="text-[11px] text-white/30 mt-1">SIH 2026 Working Prototype</span>
           </div>
         </div>
