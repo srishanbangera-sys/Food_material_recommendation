@@ -657,6 +657,30 @@ function AltCard({ rec, delay }: { rec: Recommendation; delay: number }) {
   )
 }
 
+function TypewriterText({ text, delay = 0 }: { text: string; delay?: number }) {
+  const [visibleText, setVisibleText] = useState('')
+
+  useEffect(() => {
+    setVisibleText('')
+    let characterIndex = 0
+    let typingTimer: number | undefined
+    const startTimer = window.setTimeout(() => {
+      typingTimer = window.setInterval(() => {
+        characterIndex += 1
+        setVisibleText(text.slice(0, characterIndex))
+        if (characterIndex >= text.length && typingTimer) window.clearInterval(typingTimer)
+      }, 55)
+    }, delay)
+
+    return () => {
+      window.clearTimeout(startTimer)
+      if (typingTimer) window.clearInterval(typingTimer)
+    }
+  }, [text, delay])
+
+  return <span className="pixel-typewriter" aria-label={text}>{visibleText}</span>
+}
+
 function ResultsSection({ form, response, onReset }: { form: FormData; response: PredictionResponse; onReset: () => void }) {
   return (
     <section id="results" className="pixel-results relative w-full overflow-hidden bg-[#080b12] text-white">
@@ -665,13 +689,13 @@ function ResultsSection({ form, response, onReset }: { form: FormData; response:
       <div className="relative z-10 max-w-5xl mx-auto px-5 sm:px-8 py-24 sm:py-32">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-10 result-card-anim">
           <div>
-            <div className="pixel-kicker flex items-center gap-2 text-emerald-300 text-xs font-semibold uppercase tracking-[0.18em]">
+            <div className="pixel-type pixel-kicker flex items-center gap-2 text-emerald-300 text-xs font-semibold uppercase tracking-[0.18em]">
               <span className="pixel-led w-2 h-2 bg-emerald-400" />
               Prediction Ready
             </div>
-            <h2 className="pixel-heading text-2xl sm:text-4xl font-bold text-white mt-4">Your packaging match</h2>
+            <h2 className="pixel-type pixel-heading text-2xl sm:text-4xl font-bold text-white mt-4">Your packaging match</h2>
           </div>
-          <div className="pixel-meta text-xs text-white/40 sm:text-right">Analysis for<br /><span className="text-white/80">{response.food_type}</span></div>
+          <div className="pixel-type pixel-meta text-xs text-white/40 sm:text-right">Analysis for<br /><span className="text-white/80">{response.food_type}</span></div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_0.65fr] gap-4">
@@ -679,15 +703,15 @@ function ResultsSection({ form, response, onReset }: { form: FormData; response:
             <div className="pixel-corner pixel-corner-one" />
             <div className="pixel-corner pixel-corner-two" />
             <div className="relative">
-              <div className="pixel-kicker flex items-center gap-3 text-emerald-200/70 text-xs uppercase tracking-[0.16em] font-semibold">
+              <div className="pixel-type pixel-kicker flex items-center gap-3 text-emerald-200/70 text-xs uppercase tracking-[0.16em] font-semibold">
                 <PackageOpen size={18} strokeWidth={1.6} /> Recommended packaging
               </div>
-              <h3 className="pixel-value max-w-xl text-3xl sm:text-5xl font-semibold leading-tight text-white mt-8">{response.packaging_type}</h3>
+              <h3 className="pixel-value max-w-xl text-3xl sm:text-5xl font-semibold leading-tight text-white mt-8"><TypewriterText text={response.packaging_type} delay={550} /></h3>
               <div className="flex flex-wrap gap-2 mt-8">
-                <span className="pixel-chip inline-flex items-center gap-2 px-3 py-2 text-xs text-white/70">
+                <span className="pixel-type pixel-chip inline-flex items-center gap-2 px-3 py-2 text-xs text-white/70">
                   <Thermometer size={14} className="text-orange-300" /> {form.storageTemp}°C storage
                 </span>
-                <span className="pixel-chip inline-flex items-center gap-2 px-3 py-2 text-xs text-white/70">
+                <span className="pixel-type pixel-chip inline-flex items-center gap-2 px-3 py-2 text-xs text-white/70">
                   <span className="text-sky-300">RH</span> {form.humidity}% humidity
                 </span>
               </div>
@@ -695,21 +719,21 @@ function ResultsSection({ form, response, onReset }: { form: FormData; response:
           </div>
 
           <div className="pixel-panel pixel-panel-secondary p-7 sm:p-8 flex flex-col justify-between result-card-anim" style={{ animationDelay: '0.22s' }}>
-            <div className="pixel-kicker flex items-center gap-3 text-white/50 text-xs uppercase tracking-[0.16em] font-semibold">
+            <div className="pixel-type pixel-kicker flex items-center gap-3 text-white/50 text-xs uppercase tracking-[0.16em] font-semibold">
               <Clock3 size={18} strokeWidth={1.6} className="text-amber-300" /> Predicted shelf life
             </div>
             <div className="mt-10">
-              <span className="pixel-number text-5xl sm:text-6xl font-semibold text-white">{response.predicted_shelf_life_days}</span>
-              <span className="pixel-unit text-lg text-white/50 ml-2">days</span>
+              <span className="pixel-number text-5xl sm:text-6xl font-semibold text-white"><TypewriterText text={String(response.predicted_shelf_life_days)} delay={700} /></span>
+              <span className="pixel-type pixel-unit text-lg text-white/50 ml-2">days</span>
             </div>
             <div className="pixel-rule h-px mt-8 mb-4" />
-            <p className="pixel-meta text-xs text-white/40 leading-relaxed">Model estimate based on the submitted food type, temperature, and humidity.</p>
+            <p className="pixel-type pixel-meta text-xs text-white/40 leading-relaxed">Model estimate based on the submitted food type, temperature, and humidity.</p>
           </div>
         </div>
 
         <div className="flex justify-end mt-8 result-card-anim" style={{ animationDelay: '0.32s' }}>
           <button onClick={onReset}
-            className="pixel-button text-xs font-medium text-white/60 hover:text-white px-6 py-3 transition-all duration-200">
+            className="pixel-type pixel-button text-xs font-medium text-white/60 hover:text-white px-6 py-3 transition-all duration-200">
             Try Another Product →
           </button>
         </div>
@@ -1048,7 +1072,7 @@ export default function App() {
   const handleReset = () => { setShowResults(false); setPrediction(null); setForm({ ...DEFAULT_FORM }) }
 
   return (
-    <div className="min-h-screen bg-black tracking-[-0.02em]" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="pixel-ui min-h-screen bg-black tracking-[-0.02em]" style={{ fontFamily: "'Manrope', sans-serif" }}>
       <Nav />
       <section id="home" className="relative w-full overflow-hidden h-screen bg-black" style={{ height: '100dvh' }}>
         <div className="absolute inset-0 bg-center bg-cover bg-no-repeat z-10 hero-zoom" style={{ backgroundImage: `url(${bgImage1})` }} />
