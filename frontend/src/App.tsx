@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Clock3, Menu, PackageOpen, Thermometer, X } from 'lucide-react'
 
 const bgImage1 = '/bg1.png'
 const bgImage2 = '/bg2.png'
@@ -182,6 +182,12 @@ interface FormData {
   humidity: number
   respirationRate: number
   transportation: string
+}
+
+interface PredictionResponse {
+  food_type: string
+  packaging_type: string
+  predicted_shelf_life_days: number
 }
 
 const DEFAULT_FORM: FormData = {
@@ -472,7 +478,7 @@ function HowItWorksSection() {
 function RecommendSection({ form, setForm, onSubmit }: {
   form: FormData
   setForm: React.Dispatch<React.SetStateAction<FormData>>
-  onSubmit: () => void
+  onSubmit: () => Promise<void>
 }) {
   const [step, setStep] = useState(1)
   const [direction, setDirection] = useState<'next' | 'back'>('next')
@@ -480,7 +486,6 @@ function RecommendSection({ form, setForm, onSubmit }: {
   const [showSuggestions, setShowSuggestions] = useState(false)
   const suggestRef = useRef<HTMLDivElement>(null)
 
-  const isFreshProduce = FRESH_PRODUCE.some((p) => form.commodity.toLowerCase().includes(p))
   const filteredSuggestions = COMMODITY_SUGGESTIONS.filter((s) =>
     s.toLowerCase().includes(form.commodity.toLowerCase())
   ).slice(0, 6)
@@ -498,22 +503,20 @@ function RecommendSection({ form, setForm, onSubmit }: {
 
   const canNext = () => {
     if (step === 1) return form.commodity.trim().length > 0
-    if (step === 2) return form.shelfLife > 0
-    return true
+    if (step === 2) return Number.isFinite(form.storageTemp)
+    return Number.isFinite(form.humidity)
   }
 
   const goNext = () => {
     if (!canNext()) return
     if (step === 3) {
       setSubmitting(true)
-      setTimeout(() => {
-        setSubmitting(false)
-        onSubmit()
+      onSubmit().then(() => {
         setTimeout(() => {
           const el = document.getElementById('results')
           if (el) el.scrollIntoView({ behavior: 'smooth' })
         }, 100)
-      }, 2000)
+      }).finally(() => setSubmitting(false))
       return
     }
     setDirection('next')
@@ -543,89 +546,25 @@ function RecommendSection({ form, setForm, onSubmit }: {
           )}
         </div>
         <div>
-          <label className={labelBase}>Moisture Content — {form.moisture}%</label>
-          <input type="range" min={0} max={100} step={1} value={form.moisture} onChange={(e) => set('moisture', +e.target.value)} className="recommend-slider w-full" />
-          <div className="flex justify-between text-[10px] text-white/25 mt-1"><span>0%</span><span>50%</span><span>100%</span></div>
-        </div>
-        <div>
-          <label className={labelBase}>Oil / Fat Content — {form.oilFat}%</label>
-          <input type="range" min={0} max={100} step={1} value={form.oilFat} onChange={(e) => set('oilFat', +e.target.value)} className="recommend-slider w-full" />
-          <div className="flex justify-between text-[10px] text-white/25 mt-1"><span>0%</span><span>50%</span><span>100%</span></div>
-        </div>
-        <div>
-          <label className={labelBase}>pH Level</label>
-          <input type="number" min={0} max={14} step={0.1} className={inputBase} placeholder="6.5" value={form.pH} onChange={(e) => set('pH', +e.target.value)} />
-          <span className="text-[10px] text-white/25 mt-1 inline-block">Range: 0 – 14</span>
+          <p className="text-sm text-white/50 leading-relaxed">Enter the food type exactly as it appears in the product database.</p>
         </div>
       </div>
     )
     if (step === 2) return (
       <div className="flex flex-col gap-5">
         <div>
-          <label className={labelBase}>Desired Shelf Life *</label>
-          <div className="flex gap-2">
-            <input type="number" min={1} className={`${inputBase} flex-1`} placeholder="30" value={form.shelfLife} onChange={(e) => set('shelfLife', +e.target.value)} />
-            <select className={`${inputBase} w-28 cursor-pointer`} value={form.shelfLifeUnit} onChange={(e) => set('shelfLifeUnit', e.target.value)}>
-              <option value="days">Days</option><option value="weeks">Weeks</option><option value="months">Months</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label className={labelBase}>Storage Type</label>
-          <div className="flex rounded-xl overflow-hidden border border-white/[0.12]">
-            {['Ambient', 'Chilled', 'Frozen'].map((t) => (
-              <button key={t} type="button" onClick={() => set('storageType', t)}
-                className={`flex-1 py-3 text-sm font-medium transition-all ${form.storageType === t ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white/[0.04] text-white/50 hover:bg-white/[0.08] hover:text-white/70'}`}>
-                {t}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <label className={labelBase}>Storage Temperature — {form.storageTemp}°C</label>
-          <input type="range" min={-30} max={50} step={1} value={form.storageTemp} onChange={(e) => set('storageTemp', +e.target.value)} className="recommend-slider w-full" />
-          <div className="flex justify-between text-[10px] text-white/25 mt-1"><span>-30°C</span><span>10°C</span><span>50°C</span></div>
-        </div>
-        <div>
-          <label className={labelBase}>Relative Humidity — {form.humidity}%</label>
-          <input type="range" min={0} max={100} step={1} value={form.humidity} onChange={(e) => set('humidity', +e.target.value)} className="recommend-slider w-full" />
-          <div className="flex justify-between text-[10px] text-white/25 mt-1"><span>0%</span><span>50%</span><span>100%</span></div>
+          <label className={labelBase}>Temperature (°C) *</label>
+          <input type="number" step={0.1} className={inputBase} placeholder="25" value={form.storageTemp} onChange={(e) => set('storageTemp', +e.target.value)} />
+          <span className="text-[10px] text-white/25 mt-1 inline-block">Sent as temperature_c</span>
         </div>
       </div>
     )
     return (
       <div className="flex flex-col gap-5">
-        {isFreshProduce && (
-          <div>
-            <label className={labelBase}>Respiration Rate (mg CO₂/kg·hr)</label>
-            <input type="number" min={0} step={1} className={inputBase} placeholder="20" value={form.respirationRate} onChange={(e) => set('respirationRate', +e.target.value)} />
-            <span className="text-[10px] text-white/25 mt-1 inline-block">Shown because "{form.commodity}" is fresh produce</span>
-          </div>
-        )}
         <div>
-          <label className={labelBase}>Transportation Condition</label>
-          <select className={`${inputBase} cursor-pointer`} value={form.transportation} onChange={(e) => set('transportation', e.target.value)}>
-            <option value="Local/Short-distance">Local / Short-distance</option>
-            <option value="Long-distance/Export">Long-distance / Export</option>
-            <option value="Cold chain">Cold Chain</option>
-          </select>
-        </div>
-        <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-4">
-          <h4 className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-3">Review Summary</h4>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-            {([
-              ['Commodity', form.commodity], ['Moisture', `${form.moisture}%`], ['Oil/Fat', `${form.oilFat}%`],
-              ['pH', form.pH.toString()], ['Shelf Life', `${form.shelfLife} ${form.shelfLifeUnit}`],
-              ['Storage', form.storageType], ['Temp', `${form.storageTemp}°C`], ['Humidity', `${form.humidity}%`],
-              ['Transport', form.transportation],
-              ...(isFreshProduce ? [['Respiration', `${form.respirationRate} mg CO₂/kg·hr`]] : []),
-            ] as [string, string][]).map(([label, val]) => (
-              <div key={label} className="flex justify-between">
-                <span className="text-white/40">{label}</span>
-                <span className="text-white/80 font-medium">{val}</span>
-              </div>
-            ))}
-          </div>
+          <label className={labelBase}>Humidity (%) *</label>
+          <input type="number" min={0} max={100} step={0.1} className={inputBase} placeholder="60" value={form.humidity} onChange={(e) => set('humidity', +e.target.value)} />
+          <span className="text-[10px] text-white/25 mt-1 inline-block">Range: 0 – 100 · Sent as humidity_pct</span>
         </div>
       </div>
     )
@@ -648,7 +587,7 @@ function RecommendSection({ form, setForm, onSubmit }: {
               </div>
             </div>
             <h3 className="text-lg font-semibold text-white mb-5">
-              {step === 1 && 'Product Basics'}{step === 2 && 'Storage & Shelf Life'}{step === 3 && 'Additional Conditions'}
+              {step === 1 && 'Food Type'}{step === 2 && 'Temperature'}{step === 3 && 'Humidity'}
             </h3>
             <div className="relative overflow-hidden">
               <div key={step} className={`recommend-step-${direction}`}>{renderStep()}</div>
@@ -718,7 +657,66 @@ function AltCard({ rec, delay }: { rec: Recommendation; delay: number }) {
   )
 }
 
-function ResultsSection({ form, onReset }: { form: FormData; onReset: () => void }) {
+function ResultsSection({ form, response, onReset }: { form: FormData; response: PredictionResponse; onReset: () => void }) {
+  return (
+    <section id="results" className="relative w-full overflow-hidden bg-[#080b12] text-white">
+      <div className="absolute inset-0 opacity-20 bg-center bg-cover" style={{ backgroundImage: 'url(/bg3.png)' }} />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#080b12]/70 via-[#080b12]/95 to-[#080b12]" />
+      <div className="relative z-10 max-w-5xl mx-auto px-5 sm:px-8 py-24 sm:py-32">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-10 result-card-anim">
+          <div>
+            <div className="flex items-center gap-2 text-emerald-300 text-xs font-semibold uppercase tracking-[0.18em]">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
+              Prediction Ready
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-bold text-white mt-3">Your packaging match</h2>
+          </div>
+          <div className="text-sm text-white/40 sm:text-right">Analysis for<br /><span className="text-white/80">{response.food_type}</span></div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_0.65fr] gap-4">
+          <div className="relative overflow-hidden rounded-2xl border border-emerald-400/25 bg-emerald-400/[0.08] p-7 sm:p-10 result-card-anim" style={{ animationDelay: '0.12s' }}>
+            <div className="absolute -right-12 -top-12 w-44 h-44 rounded-full border border-emerald-300/15" />
+            <div className="absolute -right-5 -top-5 w-28 h-28 rounded-full border border-emerald-300/10" />
+            <div className="relative">
+              <div className="flex items-center gap-3 text-emerald-200/70 text-xs uppercase tracking-[0.16em] font-semibold">
+                <PackageOpen size={18} strokeWidth={1.6} /> Recommended packaging
+              </div>
+              <h3 className="max-w-xl text-3xl sm:text-5xl font-semibold leading-tight text-white mt-8">{response.packaging_type}</h3>
+              <div className="flex flex-wrap gap-2 mt-8">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/15 px-3 py-2 text-xs text-white/70">
+                  <Thermometer size={14} className="text-orange-300" /> {form.storageTemp}°C storage
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/15 px-3 py-2 text-xs text-white/70">
+                  <span className="text-sky-300">RH</span> {form.humidity}% humidity
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-7 sm:p-8 flex flex-col justify-between result-card-anim" style={{ animationDelay: '0.22s' }}>
+            <div className="flex items-center gap-3 text-white/50 text-xs uppercase tracking-[0.16em] font-semibold">
+              <Clock3 size={18} strokeWidth={1.6} className="text-amber-300" /> Predicted shelf life
+            </div>
+            <div className="mt-10">
+              <span className="text-6xl sm:text-7xl font-semibold tracking-tight text-white">{response.predicted_shelf_life_days}</span>
+              <span className="text-lg text-white/50 ml-2">days</span>
+            </div>
+            <div className="h-px bg-white/10 mt-8 mb-4" />
+            <p className="text-xs text-white/40 leading-relaxed">Model estimate based on the submitted food type, temperature, and humidity.</p>
+          </div>
+        </div>
+
+        <div className="flex justify-end mt-8 result-card-anim" style={{ animationDelay: '0.32s' }}>
+          <button onClick={onReset}
+            className="text-sm font-medium text-white/60 hover:text-white border border-white/15 hover:border-emerald-300/40 px-6 py-3 rounded-full transition-all duration-200 hover:bg-white/5">
+            Try Another Product →
+          </button>
+        </div>
+      </div>
+    </section>
+  )
+
   const { primary, alternatives } = getMockResults(form)
 
   const specs = [
@@ -1013,6 +1011,7 @@ export default function App() {
   const [cursorPos, setCursorPos] = useState({ x: -999, y: -999 })
   const [form, setForm] = useState<FormData>({ ...DEFAULT_FORM })
   const [showResults, setShowResults] = useState(false)
+  const [prediction, setPrediction] = useState<PredictionResponse | null>(null)
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => { mouse.current.x = e.clientX; mouse.current.y = e.clientY }
@@ -1027,8 +1026,31 @@ export default function App() {
     return () => { window.removeEventListener('mousemove', handleMouseMove); if (rafRef.current) cancelAnimationFrame(rafRef.current) }
   }, [])
 
-  const handleFormSubmit = () => setShowResults(true)
-  const handleReset = () => { setShowResults(false); setForm({ ...DEFAULT_FORM }) }
+  const handleFormSubmit = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          food_type: form.commodity.trim(),
+          temperature_c: form.storageTemp,
+          humidity_pct: form.humidity,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => null)
+        throw new Error(error?.detail || 'Prediction request failed.')
+      }
+
+      setPrediction(await response.json() as PredictionResponse)
+      setShowResults(true)
+    } catch (error) {
+      setShowResults(false)
+      window.alert(error instanceof Error ? error.message : 'Unable to connect to the backend.')
+    }
+  }
+  const handleReset = () => { setShowResults(false); setPrediction(null); setForm({ ...DEFAULT_FORM }) }
 
   return (
     <div className="min-h-screen bg-black tracking-[-0.02em]" style={{ fontFamily: "'Inter', sans-serif" }}>
@@ -1052,7 +1074,7 @@ export default function App() {
 
       <HowItWorksSection />
       <RecommendSection form={form} setForm={setForm} onSubmit={handleFormSubmit} />
-      {showResults && <ResultsSection form={form} onReset={handleReset} />}
+      {showResults && prediction && <ResultsSection form={form} response={prediction} onReset={handleReset} />}
 
       {/* Target anchor elements for nav links if not yet in full sections */}
       <div id="database" />
