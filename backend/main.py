@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
+from rag.pipeline import answer_question
+from schemas import PredictRequest, PredictResponse, AskRequest, AskResponse
 
 from database import engine
 from schemas import PredictRequest, PredictResponse
@@ -68,3 +70,21 @@ def predict(request: PredictRequest):
         packaging_type=packaging_type,
         predicted_shelf_life_days=round(float(predicted_shelf_life), 1)
     )
+
+@app.post("/ask", response_model=AskResponse)
+def ask(request: AskRequest):
+    if not request.question or not request.question.strip():
+        raise HTTPException(status_code=400, detail="Question cannot be empty")
+
+    try:
+        result = answer_question(request.question)
+    except Exception as e:
+        # All LLM providers failed (quota, auth, etc.) or something else
+        # broke in the pipeline — surface a clean error instead of a
+        # raw 500 traceback, since right now providers are flaky.
+        raise HTTPException(
+            status_code=503,
+            detail=f"Unable to generate an answer right now: {e}",
+        )
+
+    return AskResponse(**result)

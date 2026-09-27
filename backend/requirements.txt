@@ -5,3 +5,15 @@ sqlalchemy
 pandas
 scikit-learn==1.6.1
 joblib
+
+langchain
+langchain-community
+langchain-chroma
+langchain-huggingface
+chromadb
+sentence-transformers
+pypdf
+langchain-text-splitters
+langchain-google-genai
+langchain-mistralai
+langchain-openai

@@ -1,3 +1,4 @@
+
 Food_Type,Respiration_Rate,Ethylene_Production,Ethylene_Sensitivity,Moisture_Content_Pct,pH_Level,Chilling_Sensitivity,Storage_Temperature_C,Relative_Humidity_Pct,Packaging_Material_Type,OTR_cc_m2_day,WVTR_g_m2_day,Shelf_Life_Days
 Strawberry,Very High,Low,Low,91.0,3.5,No,2,90,PP Perforated Clamshell,8000,500,6
 Strawberry,Very High,Low,Low,91.0,3.5,No,2,95,MAP High Barrier,8,3,12
