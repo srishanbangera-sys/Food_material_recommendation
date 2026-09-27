@@ -12,6 +12,7 @@ __pycache__/
 .env
 .env.*
 !.env.example
+chroma_store/
 
 # Packaging and build artifacts
 build/
