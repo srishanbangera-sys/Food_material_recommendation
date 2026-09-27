@@ -1,39 +1,4 @@
-# PakGenie Backend
 
-FastAPI backend powering two features:
-
-1. **Packaging Prediction** (`/predict`) — predicts the best packaging type for a food item and its expected shelf life, using two trained ML models (a packaging classifier and a shelf-life regressor) backed by a SQLite database.
-2. **AI Assistant** (`/ask`) — a RAG-based chat endpoint that answers free-form questions about food packaging and shelf life, using a fallback chain of LLM providers, a Chroma vector store for retrieval, and a semantic cache for instant repeat answers.
-
-## Project Structure
-
-backend/
-├── models/
-│ ├── packaging_classifier_pipeline.joblib
-│ ├── packaging_label_encoder.joblib
-│ └── shelf_life_regressor_pipeline.joblib
-├── data/
-│ ├── packaging_classifier_dataset.csv
-│ ├── shelf_life_regressor_dataset.csv
-│ └── PakGenie_Packaging_Knowledge_Reference.pdf
-├── rag/
-│ ├── config.py # env-driven settings (LLM providers, cache threshold, etc.)
-│ ├── embeddings.py # shared embedding model (all-MiniLM-L6-v2)
-│ ├── vector_store.py # Chroma stores: packaging_knowledge + semantic_cache
-│ ├── ingest.py # loads SQLite rows + PDF chunks into Chroma
-│ ├── semantic_cache.py # checks/stores cached (question -> answer) pairs
-│ ├── llm_client.py # LLM fallback chain (Gemini -> Mistral -> ...)
-│ └── pipeline.py # ties cache + retrieval + LLM together (answer_question)
-├── database.py # DB connection setup
-├── create_tables.py # creates food, packaging, shelf_life_data tables
-├── load_data.py # loads the CSVs into the database
-├── schemas.py # request/response models
-├── ml_models.py # loads the 3 trained ML models
-├── crud.py # database query functions
-├── main.py # FastAPI app, /predict and /ask endpoints
-├── .env # local secrets (not committed)
-├── .env.example # template showing required variables
-└── requirements.txt
 
 
 ## Setup Instructions
