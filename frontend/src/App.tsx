@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Clock3, Menu, PackageOpen, Thermometer, X } from 'lucide-react'
+import ChatWidget from './components/ChatWidget'
+import { API_BASE_URL } from './config'
 
 const bgImage1 = '/bg1.png'
 const bgImage2 = '/bg2.png'
@@ -1047,7 +1049,7 @@ export default function App() {
 
   const handleFormSubmit = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/predict', {
+      const response = await fetch(`${API_BASE_URL}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1100,6 +1102,7 @@ export default function App() {
       <div id="about" />
 
       <Footer />
+       <ChatWidget />
     </div>
   )
 }

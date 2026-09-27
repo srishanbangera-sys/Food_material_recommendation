@@ -1,13 +1,15 @@
+from dotenv import load_dotenv
+load_dotenv(override=True)
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
-from rag.pipeline import answer_question
-from schemas import PredictRequest, PredictResponse, AskRequest, AskResponse
 
 from database import engine
-from schemas import PredictRequest, PredictResponse
+from schemas import PredictRequest, PredictResponse, AskRequest, AskResponse
 from ml_models import model1, label_encoder, model2
 from crud import get_food, get_packaging
+from rag.pipeline import answer_question
 
 app = FastAPI()
 
